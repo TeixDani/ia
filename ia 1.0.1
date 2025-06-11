@@ -1,7 +1,26 @@
 from IPython.display import display, HTML
+
 html_code = """
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 <style>
+    @keyframes glowPulse {
+        0%, 100% {
+            box-shadow: 0 0 10px rgba(140, 82, 255, 0.3), 0 0 15px rgba(140, 82, 255, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 14px rgba(140, 82, 255, 0.45), 0 0 20px rgba(140, 82, 255, 0.3);
+        }
+    }
+
+    @keyframes glowPulseBot {
+        0%, 100% {
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 15px rgba(0, 170, 255, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 14px rgba(0, 255, 255, 0.45), 0 0 20px rgba(0, 170, 255, 0.3);
+        }
+    }
+
     body {
         margin: 0;
         padding: 0;
@@ -19,6 +38,7 @@ html_code = """
         position: relative;
         transition: background-image 0.3s ease-in-out;
     }
+
     .glow-circle {
         position: absolute;
         border-radius: 50%;
@@ -30,6 +50,7 @@ html_code = """
         filter: blur(8px);
         z-index: 0;
     }
+
     .glow-circle.one { top: 15%; left: 8%; animation-delay: 0s; }
     .glow-circle.two {
         bottom: 10%; right: 10%;
@@ -37,17 +58,20 @@ html_code = """
         box-shadow: 0 0 35px 18px #00ffff44;
         animation-delay: 2s;
     }
+
     .glow-circle.three {
         top: 55%; left: 60%; width: 160px; height: 160px;
         background: radial-gradient(circle, rgba(140,82,255,0.2) 0%, transparent 70%);
         box-shadow: 0 0 30px 15px #8c52ff33;
         animation-delay: 4s;
     }
+
     @keyframes float {
         0% { transform: translateY(0px); opacity: 0.4; }
         50% { transform: translateY(-20px); opacity: 0.6; }
         100% { transform: translateY(0px); opacity: 0.4; }
     }
+
     .title-bar {
         position: fixed; top: 0; left: 0; width: 100%;
         padding: 0.7rem 1.5rem;
@@ -59,6 +83,7 @@ html_code = """
         box-shadow: 0 0 12px #8c52ff33;
         z-index: 1001;
     }
+
     .menu-icon {
         font-size: 1.5rem;
         color: #8c52ff;
@@ -70,9 +95,9 @@ html_code = """
         padding: 0.3rem;
         user-select: none;
     }
-    .menu-icon:hover {
-        transform: scale(1.15);
-    }
+
+    .menu-icon:hover { transform: scale(1.15); }
+
     .title-bar h1 {
         margin: 0;
         font-size: 1.4rem;
@@ -81,6 +106,7 @@ html_code = """
         letter-spacing: 1px;
         text-shadow: 0 0 8px #8c52ff99;
     }
+
     #chat-container {
         margin-top: 64px;
         margin-bottom: 100px;
@@ -93,6 +119,7 @@ html_code = """
         z-index: 1;
         position: relative;
     }
+
     .message {
         padding: 1rem 1.5rem;
         border-radius: 20px;
@@ -103,24 +130,28 @@ html_code = """
         border: 1px solid rgba(255, 255, 255, 0.06);
         animation: slideUp 0.3s ease;
     }
+
     .user {
         align-self: flex-end;
         background: linear-gradient(135deg, rgba(140, 82, 255, 0.15), rgba(140, 82, 255, 0.25));
         border-left: 3px solid #8c52ff;
-        box-shadow: 0 0 10px #8c52ff55, 0 0 15px #8c52ff44;
+        animation: glowPulse 3.5s ease-in-out infinite;
     }
+
     .bot {
         align-self: flex-start;
         background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 170, 255, 0.2));
         border-right: 3px solid #00ffff;
-        box-shadow: 0 0 10px #00ffff66, 0 0 15px #00aaff44;
+        animation: glowPulseBot 3.5s ease-in-out infinite;
     }
+
     .timestamp {
         font-size: 0.7rem;
         color: #bbb;
         margin-top: 5px;
         text-align: right;
     }
+
     #input-box {
         position: fixed; bottom: 0; left: 0; width: 100%;
         padding: 0.7rem 1rem;
@@ -131,6 +162,7 @@ html_code = """
         box-sizing: border-box;
         z-index: 1000;
     }
+
     #user-input {
         flex: 1;
         min-width: 0;
@@ -144,10 +176,12 @@ html_code = """
         transition: 0.3s;
         outline: none;
     }
+
     #user-input:focus {
         box-shadow: 0 0 20px #8c52ff99, inset 0 0 16px #8c52ffaa;
         background: #272742;
     }
+
     #send-button {
         width: 48px;
         height: 48px;
@@ -162,19 +196,23 @@ html_code = """
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         flex-shrink: 0;
     }
+
     #send-button:hover {
         transform: scale(1.2);
         box-shadow: 0 0 25px #00ffffcc, 0 0 35px #8c52ffaa;
     }
+
     #send-button svg {
         width: 24px;
         height: 24px;
         fill: #111;
     }
+
     @keyframes slideUp {
         from { transform: translateY(20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
+
     #side-menu {
         position: fixed;
         top: 0;
@@ -191,6 +229,7 @@ html_code = """
         transition: transform 0.4s ease, opacity 0.3s ease;
         z-index: 2000;
     }
+
     @keyframes neonPulse {
         0%, 100% {
             box-shadow: 2px 0 12px #8c52ff44, 0 0 8px #8c52ff33;
@@ -199,18 +238,21 @@ html_code = """
             box-shadow: 2px 0 20px #8c52ff88, 0 0 16px #8c52ff55;
         }
     }
+
     #side-menu.active {
         transform: translateX(0);
         opacity: 1;
         visibility: visible;
         animation: neonPulse 2.5s ease-in-out infinite;
     }
+
     #side-menu h2 {
         color: #8c52ff;
         font-size: 1.2rem;
         margin-bottom: 1rem;
         text-shadow: 0 0 6px #8c52ff88;
     }
+
     #side-menu label {
         display: block;
         margin-top: 1rem;
@@ -218,6 +260,7 @@ html_code = """
         color: #ccc;
         font-size: 0.9rem;
     }
+
     #side-menu input[type="text"],
     #side-menu input[type="color"] {
         width: 100%;
@@ -228,6 +271,7 @@ html_code = """
         background: #282840;
         color: #fff;
     }
+
     #close-menu {
         margin-top: 2rem;
         background: transparent;
@@ -253,6 +297,7 @@ html_code = """
         }
     }
 </style>
+<!-- HTML -->
 <div class="glow-circle one"></div>
 <div class="glow-circle two"></div>
 <div class="glow-circle three"></div>
@@ -346,4 +391,5 @@ html_code = """
     });
 </script>
 """
+
 display(HTML(html_code))
