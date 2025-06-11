@@ -3,24 +3,6 @@ from IPython.display import display, HTML
 html_code = """
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 <style>
-    @keyframes glowPulse {
-        0%, 100% {
-            box-shadow: 0 0 10px rgba(140, 82, 255, 0.3), 0 0 15px rgba(140, 82, 255, 0.2);
-        }
-        50% {
-            box-shadow: 0 0 14px rgba(140, 82, 255, 0.45), 0 0 20px rgba(140, 82, 255, 0.3);
-        }
-    }
-
-    @keyframes glowPulseBot {
-        0%, 100% {
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 15px rgba(0, 170, 255, 0.2);
-        }
-        50% {
-            box-shadow: 0 0 14px rgba(0, 255, 255, 0.45), 0 0 20px rgba(0, 170, 255, 0.3);
-        }
-    }
-
     @keyframes bubbleFloat {
         0% { transform: translateY(0px); opacity: 0.9; }
         50% { transform: translateY(-3px); opacity: 1; }
@@ -139,16 +121,16 @@ html_code = """
 
     .user {
         align-self: flex-end;
-        background: linear-gradient(135deg, rgba(140, 82, 255, 0.15), rgba(140, 82, 255, 0.25));
+        background: rgba(140, 82, 255, 0.2);
         border-left: 3px solid #8c52ff;
-        animation-name: glowPulse, bubbleFloat;
+        box-shadow: 0 0 14px rgba(140, 82, 255, 0.45), 0 0 20px rgba(140, 82, 255, 0.3);
     }
 
     .bot {
         align-self: flex-start;
-        background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 170, 255, 0.2));
+        background: rgba(0, 255, 255, 0.2);
         border-right: 3px solid #00ffff;
-        animation-name: glowPulseBot, bubbleFloat;
+        box-shadow: 0 0 14px rgba(0, 255, 255, 0.45), 0 0 20px rgba(0, 170, 255, 0.3);
     }
 
     .timestamp {
@@ -171,7 +153,6 @@ html_code = """
 
     #user-input {
         flex: 1;
-        min-width: 0;
         padding: 0.9rem 1.2rem;
         font-size: 1rem;
         border: none;
@@ -200,7 +181,6 @@ html_code = """
         cursor: pointer;
         box-shadow: 0 0 15px #00ffffaa, 0 0 30px #8c52ff55;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        flex-shrink: 0;
     }
 
     #send-button:hover {
@@ -234,15 +214,6 @@ html_code = """
         visibility: hidden;
         transition: transform 0.4s ease, opacity 0.3s ease;
         z-index: 2000;
-    }
-
-    @keyframes neonPulse {
-        0%, 100% {
-            box-shadow: 2px 0 12px #8c52ff44, 0 0 8px #8c52ff33;
-        }
-        50% {
-            box-shadow: 2px 0 20px #8c52ff88, 0 0 16px #8c52ff55;
-        }
     }
 
     #side-menu.active {
@@ -295,22 +266,18 @@ html_code = """
         .message { font-size: 0.9rem; }
         #user-input { font-size: 0.9rem; }
         #send-button { width: 44px; height: 44px; }
-
-        body {
-            background-size: cover !important;
-            background-position: center center !important;
-            background-attachment: scroll !important;
-        }
     }
 </style>
 
 <div class="glow-circle one"></div>
 <div class="glow-circle two"></div>
 <div class="glow-circle three"></div>
+
 <div class="title-bar">
     <div class="menu-icon" onclick="document.getElementById('side-menu').classList.add('active')">&#8942;</div>
     <h1>Chat Neon</h1>
 </div>
+
 <div id="side-menu">
     <h2>Configurações</h2>
     <label>URL de Fundo:</label>
@@ -321,13 +288,16 @@ html_code = """
     <input type="color" id="bot-color" value="#00ffff">
     <button id="close-menu">Fechar</button>
 </div>
+
 <div id="chat-container"></div>
+
 <div id="input-box">
     <input type="text" id="user-input" placeholder="Digite sua mensagem..." aria-label="Digite sua mensagem">
     <button id="send-button" title="Enviar mensagem">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
 </div>
+
 <script>
     const chatContainer = document.getElementById("chat-container");
     const inputBox = document.getElementById("user-input");
@@ -348,8 +318,7 @@ html_code = """
         msg.innerHTML = content;
         msg.appendChild(timestamp);
 
-        // Adiciona delay de animação sequencial com base na ordem
-        const delay = (messageCounter * 0.2).toFixed(1); // 0.2s entre balões
+        const delay = (messageCounter * 0.2).toFixed(1);
         msg.style.animationDelay = delay + "s";
         messageCounter++;
 
@@ -392,14 +361,24 @@ html_code = """
     document.getElementById("user-color").addEventListener("input", function() {
         const color = this.value;
         const style = document.createElement('style');
-        style.innerHTML = `.user { background: ${color}33 !important; border-left: 3px solid ${color} !important; }`;
+        style.innerHTML = `
+        .user {
+            background: ${color}33 !important;
+            border-left: 3px solid ${color} !important;
+            box-shadow: 0 0 14px ${color}77, 0 0 20px ${color}55 !important;
+        }`;
         document.head.appendChild(style);
     });
 
     document.getElementById("bot-color").addEventListener("input", function() {
         const color = this.value;
         const style = document.createElement('style');
-        style.innerHTML = `.bot { background: ${color}33 !important; border-right: 3px solid ${color} !important; }`;
+        style.innerHTML = `
+        .bot {
+            background: ${color}33 !important;
+            border-right: 3px solid ${color} !important;
+            box-shadow: 0 0 14px ${color}77, 0 0 20px ${color}55 !important;
+        }`;
         document.head.appendChild(style);
     });
 </script>
