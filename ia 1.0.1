@@ -191,10 +191,19 @@ html_code = """
         transition: transform 0.4s ease, opacity 0.3s ease;
         z-index: 2000;
     }
+    @keyframes neonPulse {
+        0%, 100% {
+            box-shadow: 2px 0 12px #8c52ff44, 0 0 8px #8c52ff33;
+        }
+        50% {
+            box-shadow: 2px 0 20px #8c52ff88, 0 0 16px #8c52ff55;
+        }
+    }
     #side-menu.active {
         transform: translateX(0);
         opacity: 1;
         visibility: visible;
+        animation: neonPulse 2.5s ease-in-out infinite;
     }
     #side-menu h2 {
         color: #8c52ff;
@@ -230,7 +239,6 @@ html_code = """
         width: 100%;
     }
 
-    /* Responsividade e fundo móvel */
     @media (max-width: 600px) {
         .title-bar h1 { font-size: 1rem; }
         .menu-icon { font-size: 1.3rem; }
