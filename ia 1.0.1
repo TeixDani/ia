@@ -21,6 +21,12 @@ html_code = """
         }
     }
 
+    @keyframes bubbleFloat {
+        0% { transform: translateY(0px); opacity: 0.9; }
+        50% { transform: translateY(-3px); opacity: 1; }
+        100% { transform: translateY(0px); opacity: 0.95; }
+    }
+
     body {
         margin: 0;
         padding: 0;
@@ -128,21 +134,21 @@ html_code = """
         line-height: 1.6;
         backdrop-filter: blur(14px);
         border: 1px solid rgba(255, 255, 255, 0.06);
-        animation: slideUp 0.3s ease;
+        animation: slideUp 0.3s ease forwards, bubbleFloat 5s ease-in-out infinite;
     }
 
     .user {
         align-self: flex-end;
         background: linear-gradient(135deg, rgba(140, 82, 255, 0.15), rgba(140, 82, 255, 0.25));
         border-left: 3px solid #8c52ff;
-        animation: glowPulse 3.5s ease-in-out infinite;
+        animation-name: glowPulse, bubbleFloat;
     }
 
     .bot {
         align-self: flex-start;
         background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 170, 255, 0.2));
         border-right: 3px solid #00ffff;
-        animation: glowPulseBot 3.5s ease-in-out infinite;
+        animation-name: glowPulseBot, bubbleFloat;
     }
 
     .timestamp {
@@ -297,7 +303,7 @@ html_code = """
         }
     }
 </style>
-<!-- HTML -->
+
 <div class="glow-circle one"></div>
 <div class="glow-circle two"></div>
 <div class="glow-circle three"></div>
@@ -326,6 +332,7 @@ html_code = """
     const chatContainer = document.getElementById("chat-container");
     const inputBox = document.getElementById("user-input");
     const sendButton = document.getElementById("send-button");
+    let messageCounter = 0;
 
     function getTime() {
         const now = new Date();
@@ -340,6 +347,12 @@ html_code = """
         timestamp.innerText = getTime();
         msg.innerHTML = content;
         msg.appendChild(timestamp);
+
+        // Adiciona delay de animação sequencial com base na ordem
+        const delay = (messageCounter * 0.2).toFixed(1); // 0.2s entre balões
+        msg.style.animationDelay = delay + "s";
+        messageCounter++;
+
         chatContainer.appendChild(msg);
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
