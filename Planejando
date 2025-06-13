@@ -395,7 +395,9 @@
 
 
 
-JAVASCRIPT
+
+JAVASCRIPT 
+
 
 
 
@@ -418,23 +420,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function appendMessage(content, sender) {
-    if (!chatContainer) return; // proteção extra
+    if (!chatContainer) return;
     const msg = document.createElement("div");
     msg.className = "message " + sender;
     msg.innerHTML = `<div>${content}</div><div class="timestamp">${getTime()}</div>`;
     chatContainer.appendChild(msg);
     chatContainer.scrollTop = chatContainer.scrollHeight;
-  }
-
-  function responderComoIA(texto) {
-    const respostas = {
-      "oi": "Olá! Como posso te ajudar hoje?",
-      "tudo bem?": "Tudo ótimo, e com você?",
-      "quem é você?": "Sou um chat estiloso feito em HTML futurista!",
-      "o que você faz?": "Eu respondo suas perguntas com estilo neon!"
-    };
-    texto = texto.toLowerCase();
-    return respostas[texto] || "Desculpa, não entendi. Pode repetir?";
   }
 
   function enviarMensagem() {
@@ -445,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function () {
     appendMessage(userText, "user");
     inputBox.value = "";
 
-    const resposta = responderComoIA(userText);
+    const resposta = obterRespostaIA(userText);
     setTimeout(() => appendMessage(resposta, "bot"), 500);
   }
 
@@ -514,4 +505,41 @@ document.addEventListener("DOMContentLoaded", function () {
       aplicarEstiloCor("bot", this.value, "bot-preview", "right");
     });
   }
+
+  // ==============================
+  // TREINAMENTO DA IA - FINAL DO CÓDIGO
+  // ==============================
+
+  // Exemplos de entrada (como a IA reconhece a intenção)
+  const exemplosIA = {
+    saudacoes: [
+      "oi", "olá", "ola", "eae", "opa", "bom dia", "boa tarde", "boa noite", "salve", "fala ai", "falae"
+    ]
+  };
+
+  // Respostas aleatórias por categoria
+  const respostasIA = {
+    saudacoes: [
+      "Opa, tudo beleza?",
+      "E aí, como você tá?",
+      "Oi oi!",
+      "Boa tarde, seja bem-vindo!",
+      "Olá, no que posso te ajudar?",
+      "Fala comigo!",
+      "Salveee!"
+    ]
+  };
+
+  // IA: função que escolhe a resposta
+  function obterRespostaIA(texto) {
+    const entrada = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    if (exemplosIA.saudacoes.some(s => entrada.includes(s))) {
+      const opcoes = respostasIA.saudacoes;
+      return opcoes[Math.floor(Math.random() * opcoes.length)];
+    }
+
+    return "Hmm... não entendi muito bem. Pode repetir?";
+  }
+
 });
