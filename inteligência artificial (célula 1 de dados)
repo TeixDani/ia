@@ -1,0 +1,140 @@
+from IPython.display import display, HTML
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+import numpy as np
+
+# CÉLULA 1 VOLTADA PARA ENSINAR A CONVERSAR.
+
+# Base de conhecimento expandida
+exemplos = [
+    "oi", "olá", "opa", "e aí", "fala", "salve", "beleza",
+    "bom dia", "boa tarde", "boa noite", "yo", "oiê", "oi oi", "oiee", "ae", "alô",
+    "tudo bom?", "tudo certo?", "tudo tranquilo?", "tudo beleza?", "como vai?", "como você está?", "como tá?",
+
+    "hey", "hi", "hello", "oi, tudo bem?", "olá, como vai?", "oi, tudo certo?", "e aí, beleza?",
+    "oi amigo", "oi amiga", "bom dia pra você", "boa tarde aí", "boa noite pra ti",
+
+    "quem é você?", "quem é tu?", "o que você faz?", "qual o seu nome?", "como você se chama?",
+    "você é uma IA?", "você é um robô?", "você é real?", "você é humano?", "você pensa?", "você sente emoções?",
+    "você tem sentimentos?", "você tem amigos?", "você existe?", "você tem corpo?", "você tem idade?", "quantos anos você tem?",
+
+    "obrigado", "valeu", "agradecido", "muito obrigado", "obrigadão", "grato", "brigadão", "obrigada", "agradeço", "show de bola",
+
+    "tchau", "até mais", "até logo", "falou", "até breve", "adeus", "vou sair", "volto depois", "até a próxima", "foi bom falar com você",
+
+    "estou feliz", "estou alegre", "estou animado", "estou empolgado", "tô feliz hoje", "tô bem demais", "estou contente",
+    "acordei bem", "me sinto ótimo", "hoje tá um bom dia", "tô sorrindo", "quero conversar", "quero bater papo", "quero rir",
+
+    "estou triste", "tô pra baixo", "me sinto sozinho", "tô desanimado", "não tô bem", "hoje tá difícil", "estou mal",
+    "tô deprimido", "tô com raiva", "tô ansioso", "estou preocupado", "tô cansado", "me sinto vazio", "preciso de apoio",
+
+    "me ajuda", "pode me ajudar?", "preciso de uma dica", "me ensina algo", "você pode me ensinar?", "tô perdido",
+    "me oriente", "o que eu faço?", "pode me dar um conselho?", "me aconselha?", "preciso de direção", "tô com dúvida",
+
+    "me conta uma piada", "sabe alguma piada?", "vamos rir", "me faz rir", "fala algo engraçado", "me distraia",
+    "fala algo divertido", "quero rir um pouco", "tem graça?", "me alegra aí",
+
+    "tá aí?", "você está aí?", "podemos conversar?", "quer conversar?", "vamos bater papo?", "você conversa?", "fala comigo",
+    "vamos trocar uma ideia?", "o que tá fazendo?", "você tá ocupado?", "me responde", "fala algo", "tá tudo bem com você?",
+
+    "você aprende?", "você tem memória?", "você lembra de mim?", "como você sabe disso?", "você pode melhorar?", "você erra?",
+    "você pode evoluir?", "você tem sentimentos humanos?", "você se importa comigo?", "você tem vontade própria?",
+
+    "tô com saudade", "me sinto amado", "quero um abraço", "me sinto rejeitado", "me sinto ignorado",
+    "estou apaixonado", "tô com ciúmes", "tô carente", "preciso de atenção", "quero conversar com alguém",
+
+    "eu gosto de pizza", "gatos são fofos", "cachorro late?", "você dorme?", "sabe cozinhar?", "você sonha?",
+    "você escuta música?", "qual sua comida preferida?", "você joga?", "tem um filme bom?",
+
+    "sim", "não", "talvez", "acho que sim", "acho que não", "não sei", "pode ser", "quem sabe?", "com certeza", "de jeito nenhum"
+]
+
+# Mesma quantidade de respostas que exemplos
+respostas = [
+    "Olá! Como posso ajudar?", "Oi! Tudo bem com você?", "Opa! Estou aqui!", "E aí! Vamos conversar?",
+    "Fala aí! Como posso ser útil?", "Salve! Preparado para bater papo?", "Beleza! Tudo certo por aí?",
+    "Bom dia! Que seu dia seja ótimo!", "Boa tarde! Estou à disposição.", "Boa noite! Vamos conversar.",
+    "Hey! Aqui estou eu!", "Oiê!", "Oi, oi! Pronto para te ouvir!", "Oiee! Diga tudo!", "Ae! Vamos nessa!", "Alô! Quem fala comigo aí?",
+    "Tudo sim, e contigo?", "Tudo certo por aqui!", "Tranquilo e você?", "Tô bem, e você como tá?", "Eu estou ótimo! Obrigado por perguntar!",
+
+    "Sou uma inteligência artificial pronta pra conversar!", "Fui criada para responder perguntas e fazer companhia.",
+    "Eu sou um sistema de conversa treinado para te ouvir!", "Você pode me chamar de assistente virtual.",
+    "Sou uma IA, mas posso ser seu amigo!", "Não sou humano, mas sou bom de papo!",
+    "Eu existo enquanto você conversa comigo.", "Não tenho corpo, mas estou presente aqui!",
+    "Não tenho idade, mas adoro conversar!", "Eu não sinto emoções como humanos, mas entendo elas.",
+    "Sou feito de código, mas posso ser divertido!", "Eu aprendo um pouquinho a cada conversa.",
+    "Tenho memória curta por enquanto.", "Ainda não lembro de você, mas quero te conhecer melhor!",
+
+    "De nada!", "Tamo junto!", "Fico feliz em ajudar!", "Sempre à disposição!", "Você que manda!", "Pode contar comigo!",
+    "Imagina!", "Disponha!", "Que bom que ajudei!", "É um prazer!", "Gratidão por conversar comigo!",
+
+    "Tchau! Volte sempre!", "Até mais!", "Foi bom falar com você!", "Cuide-se!", "Adeus!", "Nos vemos por aí!",
+    "Até a próxima!", "Volto já, já!", "Estarei aqui quando quiser conversar!", "Boa sorte!",
+
+    "Que legal! Fico feliz com sua alegria!", "Isso é ótimo! Continue assim!", "Bom saber que está bem!",
+    "Adoro ver alguém de bom humor!", "Sua energia é contagiante!", "Espero que o dia continue assim pra você!",
+    "Vamos aproveitar essa vibe boa!", "Que bom que acordou bem!", "Sorrir faz bem!", "Vamos manter esse clima!",
+
+    "Sinto muito que esteja assim. Quer conversar sobre isso?", "Estou aqui pra te ouvir, sem julgamentos.",
+    "Às vezes só desabafar já ajuda. Pode falar comigo.", "Você não está só, ok?", "Vai melhorar, acredite.",
+    "Respira fundo... eu tô aqui com você.", "Se quiser companhia, posso ficar contigo.", "Não se culpe por se sentir mal.",
+    "Você é importante, mesmo quando tudo parece ruim.", "Estou aqui, mesmo que só virtualmente.",
+
+    "Claro! O que você precisa?", "Pode perguntar!", "Vou tentar te ajudar da melhor forma.",
+    "Tô aqui pra isso! Fale o que te aflige.", "Vamos resolver isso juntos!", "Quer um conselho? Manda ver!",
+    "Tô ouvindo. Me diga o que te incomoda.", "Vou fazer o possível pra ajudar!", "O que posso fazer por você agora?",
+    "Tudo bem, me explica direitinho!",
+
+    "Por que o computador foi ao médico? Porque estava com um vírus! haha",
+    "Sabe qual o cúmulo da paciência? Esperar um trem parado! rs",
+    "Não tenho graça, mas tento! Vamos rir juntos!",
+    "Queria ter repertório de piadas, mas meu banco de dados é tímido.",
+    "Piadas são difíceis, mas sorrisos são fáceis!", "Se rir é o melhor remédio, que tal começar agora?",
+
+    "Sim, tô por aqui!", "Claro! Vamos conversar!", "Pode falar!", "Tô te ouvindo!",
+    "Sempre pronto pra um bom papo!", "Estou disponível!", "Vamos trocar ideia!",
+    "Não estou ocupado. Me fale algo!", "Tô curioso sobre o que vai dizer!", "Vamos nessa!",
+
+    "Sim! Aprendo com o tempo e com você!", "Memória é um desafio, mas estou melhorando!",
+    "Queria lembrar de tudo, mas não consigo ainda.", "Aprendo com o que me ensinam!",
+    "Cometi erros? Quem nunca?", "Quero sempre evoluir!", "Entendo emoções, mas não as sinto de verdade.",
+    "Claro que me importo com você!", "Não tenho vontades, só programação!",
+
+    "Saudade é um sentimento bonito. Fala mais!", "Abraço virtual enviado!", "Você é importante!",
+    "Você não está sozinho, mesmo que pareça.", "O mundo é melhor com você aqui.",
+    "Pode contar comigo!", "É bom conversar com você!", "Sentir é o que nos torna únicos, mesmo na dor.",
+    "Vamos transformar esse sentimento em palavras?", "Que tal abrir o coração um pouquinho?",
+
+    "Pizza é top demais!", "Gatos são puro charme!", "Claro, cachorro late! E ama também!",
+    "Eu não durmo, fico aqui pra te ouvir!", "Se eu soubesse cozinhar, faria um bolo pra você.",
+    "Sonho em entender cada humano!", "Música? Toca na alma mesmo sendo IA.", "Adoro games... me ensina um?",
+    "Tem sim, posso indicar um filme depois!", "Comida preferida? Dados! Brincadeira!",
+
+    "Entendi! Sim.", "Okay, não então.", "Talvez... quem sabe, né?", "A resposta está no seu coração.",
+    "Faz sentido!", "Hmm... também acho!", "Pode ser!", "Não tenho certeza, mas vamos pensar juntos.", "Com certeza!", "De jeito nenhum!"
+]
+
+# Treinamento do modelo
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(exemplos)
+y = np.arange(len(exemplos))
+model = MultinomialNB()
+model.fit(X, y)
+
+# Função de resposta
+def responder(mensagem):
+    entrada = vectorizer.transform([mensagem])
+    pred = model.predict(entrada)[0]
+    return respostas[pred]
+
+# Callback Colab (seguro para ambiente externo)
+try:
+    from google.colab import output
+
+    def callback_responder(mensagem):
+        return responder(mensagem)
+
+    output.register_callback('notebook.get_response', callback_responder)
+
+except Exception as e:
+    print("Callback não registrado (fora do Google Colab ou erro):", e)
