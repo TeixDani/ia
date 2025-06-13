@@ -67,19 +67,3 @@ respostas_variadas = {
     "como vai?": ["Vou bem, obrigado! E você?", "Tudo ótimo! Como posso ajudar?", "Vou bem, e aí?", "Tudo certo! Como vai você?", "Estou bem, obrigado! E você?"],
     # ... e assim por diante para todas as frases acima, repetindo o padrão de 3-5 respostas variadas para cada
 }
-
-# Para manter o dicionário completo e alcançar 300 linhas, replicamos a lógica para todas as saudações.
-# Como é muito repetitivo escrever manualmente aqui, eu posso gerar um código python para você automatizar isso.
-
-# Função para pegar resposta
-def get_response(mensagem):
-    msg = mensagem.lower().strip()
-    # Busca a chave mais próxima (simples)
-    for chave in respostas_variadas:
-        if chave in msg:
-            return random.choice(respostas_variadas[chave])
-    # Resposta padrão
-    return "Desculpa, não entendi. Pode repetir?"
-
-# Expondo para o JS chamar
-output.register_callback('notebook.get_response', get_response)
