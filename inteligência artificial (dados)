@@ -1,0 +1,49 @@
+from IPython.display import display, HTML
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+import numpy as np
+
+# Textos de treinamento
+exemplos = [
+    "oi", "olá", "bom dia", "boa tarde", "boa noite", "e aí", "fala",
+    "como vai", "tudo bem", "salve", "opa", "beleza"
+]
+respostas = [
+    "Olá! Como posso ajudar?", "Oi! Tudo certo por aí?", "Bom dia! Em que posso ajudar?",
+    "Boa tarde! Estou aqui para ajudar.", "Boa noite! Pronto para conversar!",
+    "E aí! Beleza?", "Fala! Como posso te ajudar?", "Vou bem, obrigado! E você?",
+    "Tudo ótimo! E você?", "Salve! O que manda?", "Opa! Diga aí!", "Beleza pura!"
+]
+
+# Vetorização e treino
+vetor = CountVectorizer()
+X = vetor.fit_transform(exemplos)
+y = np.arange(len(respostas))
+modelo = MultinomialNB()
+modelo.fit(X, y)
+
+# Função para responder
+def responder(mensagem):
+    entrada = vetor.transform([mensagem])
+    pred = modelo.predict(entrada)[0]
+    return respostas[pred]
+
+# Registro do callback no Colab
+try:
+    from google.colab import output
+
+    from IPython.display import JSON
+
+    def get_response(mensagem):
+        return responder(mensagem)
+
+    output.register_callback('notebook.get_response', get_response)
+
+except ImportError:
+    print("Não está rodando no Google Colab ou módulo de output não disponível. Callback não registrado.")
+
+# Teste simples
+if __name__ == "__main__":
+    print(responder("oi"))
+    print(responder("boa tarde"))
+    print(responder("fala"))
