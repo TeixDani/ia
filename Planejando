@@ -305,6 +305,313 @@
       padding: 0.7rem 1rem;
       border-radius: 20px;
       font-size: 0.9rem;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BreakIA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    @keyframes bubbleFloat {
+      10% { transform: translate3d(0px); opacity: 1; }
+      30% { transform: translate3d(-1px); opacity: 0.90; }
+      50% { transform: translate3d(-2px); opacity: 0.80; }
+      70% { transform: translate3d(-3px); opacity: 0.70; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); opacity: 0.4; }
+      50% { transform: translateY(-20px); opacity: 0.6; }
+      100% { transform: translateY(0px); opacity: 0.4; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #120028, #14002A);
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+      background-attachment: fixed;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      transition: background-image 0.3s ease-in-out;
+    }
+
+    .glow-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(140,82,255,0.25) 0%, transparent 70%);
+      box-shadow: 0 0 40px 20px #8c52ff44;
+      width: 200px;
+      height: 200px;
+      animation: float 6s ease-in-out infinite alternate;
+      filter: blur(8px);
+      z-index: 0;
+    }
+
+    .glow-circle.one { top: 15%; left: 8%; animation-delay: 0s; }
+    .glow-circle.two {
+      bottom: 10%; right: 10%;
+      background: radial-gradient(circle, rgba(0,255,255,0.25) 0%, transparent 70%);
+      box-shadow: 0 0 35px 18px #00ffff44;
+      animation-delay: 2s;
+    }
+    .glow-circle.three {
+      top: 55%; left: 60%; width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(140,82,255,0.2) 0%, transparent 70%);
+      box-shadow: 0 0 30px 15px #8c52ff33;
+      animation-delay: 4s;
+    }
+
+    .title-bar {
+      position: fixed; top: 0; left: 0; width: 100%;
+      padding: 0.7rem 1.5rem;
+      background: linear-gradient(to right, #1E003A, #0D001D);
+      border-bottom: 1px solid #8C52FF44;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 0 12px #8c52ff33;
+      z-index: 1001;
+    }
+
+    .menu-icon {
+      font-size: 1.5rem;
+      color: #8c52ff;
+      cursor: pointer;
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.3rem;
+      user-select: none;
+    }
+
+    .menu-icon:hover { transform: scale(1.15); }
+
+    .title-bar h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: #8A00FF;
+      flex: 1;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px #40007B;
+    }
+
+    #chat-container {
+      margin-top: 64px;
+      margin-bottom: 100px;
+      padding: 1.5rem 2rem;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 1;
+      position: relative;
+    }
+
+    .message {
+      padding: 1rem 1.5rem;
+      border-radius: 20px;
+      max-width: 70%;
+      font-size: 1rem;
+      line-height: 1.6;
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      animation: slideUp 0.3s ease forwards, bubbleFloat 5s ease-in-out infinite;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: rgba(140, 82, 255, 0.2);
+      border-left: 3px solid #8c52ff;
+      box-shadow: 0 0 14px rgba(140, 82, 255, 0.45), 0 0 20px rgba(140, 82, 255, 0.3);
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: rgba(0, 255, 255, 0.2);
+      border-right: 3px solid #00ffff;
+      box-shadow: 0 0 14px rgba(0, 255, 255, 0.45), 0 0 20px rgba(0, 170, 255, 0.3);
+    }
+
+    .timestamp {
+      font-size: 0.7rem;
+      color: #bbb;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    #input-box {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      padding: 0.7rem 1rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      background: #10052A;
+      border-top: 2px solid #1B0A30;
+      box-shadow: 0 -2px 15px #4000C0;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 0.9rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      background: #1B0734;
+      color: #FFFFFF;
+      box-shadow: inset 0 0 10px #4000C0, 0 0 5px #4000C0;
+      transition: 0.3s;
+      outline: none;
+    }
+
+    #user-input:focus {
+      box-shadow: 0 0 20px #8c52ff99, inset 0 0 16px #8c52ffaa;
+      background: #272742;
+    }
+
+    #send-button {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #00ffff, #8c52ff);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffffaa, 0 0 30px #8c52ff55;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #send-button:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 25px #00ffffcc, 0 0 35px #8c52ffaa;
+    }
+
+    #send-button svg {
+      width: 24px;
+      height: 24px;
+      fill: #111;
+    }
+
+    #side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 320px;
+      height: 100%;
+      background: linear-gradient(to right, #150032, #110024);
+      border-right: 2px solid #8c52ff44;
+      box-shadow: 4px 0 20px #8c52ff33;
+      padding: 2rem 1.5rem;
+      transform: translateX(-100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: transform 0.4s ease, opacity 0.3s ease;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    #side-menu.active {
+      transform: translateX(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #side-menu h2 {
+      color: #8c52ff;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 6px #8c52ff88;
+      border-bottom: 1px solid #8c52ff44;
+      padding-bottom: 0.5rem;
+    }
+
+    #side-menu label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+
+    #side-menu i {
+      color: #8c52ff;
+      min-width: 20px;
+    }
+
+    #bg-url {
+      background: #130034;
+      border: 1px solid #8c52ff66;
+      padding: 0.6rem 0.9rem;
+      border-radius: 12px;
+      color: #fff;
+      width: 100%;
+      max-width: 90%;
+      box-shadow: inset 0 0 8px #300094, 0 0 8px #8c52ff33;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 400px) {
+      #bg-url {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.7rem;
+      }
+    }
+
+    #close-menu {
+      background: linear-gradient(to right, #200045, #0D001A);
+      color: #ffffff;
+      border: 1px solid #8c52ff66;
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 0 12px #8c52ff55;
+      transition: 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    #close-menu:hover {
+      background: #8c52ff66;
+      box-shadow: 0 0 20px #8c52ffaa;
+      color: #fff;
+    }
+
+    .bubble-preview {
+      cursor: pointer;
+      padding: 0.7rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
       max-width: 80%;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -386,6 +693,8 @@
 
 </body>
 </html>
+
+<script src="comandos.js"></script>
 
 
 
