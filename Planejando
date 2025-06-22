@@ -3,315 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Neon</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    @keyframes bubbleFloat {
-      10% { transform: translate3d(0px); opacity: 1; }
-      30% { transform: translate3d(-1px); opacity: 0.90; }
-      50% { transform: translate3d(-2px); opacity: 0.80; }
-      70% { transform: translate3d(-3px); opacity: 0.70; }
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0px); opacity: 0.4; }
-      50% { transform: translateY(-20px); opacity: 0.6; }
-      100% { transform: translateY(0px); opacity: 0.4; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(135deg, #0f0f1a, #1b1b2f);
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center;
-      background-attachment: fixed;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-      transition: background-image 0.3s ease-in-out;
-    }
-
-    .glow-circle {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(140,82,255,0.25) 0%, transparent 70%);
-      box-shadow: 0 0 40px 20px #8c52ff44;
-      width: 200px;
-      height: 200px;
-      animation: float 6s ease-in-out infinite alternate;
-      filter: blur(8px);
-      z-index: 0;
-    }
-
-    .glow-circle.one { top: 15%; left: 8%; animation-delay: 0s; }
-    .glow-circle.two {
-      bottom: 10%; right: 10%;
-      background: radial-gradient(circle, rgba(0,255,255,0.25) 0%, transparent 70%);
-      box-shadow: 0 0 35px 18px #00ffff44;
-      animation-delay: 2s;
-    }
-    .glow-circle.three {
-      top: 55%; left: 60%; width: 160px; height: 160px;
-      background: radial-gradient(circle, rgba(140,82,255,0.2) 0%, transparent 70%);
-      box-shadow: 0 0 30px 15px #8c52ff33;
-      animation-delay: 4s;
-    }
-
-    .title-bar {
-      position: fixed; top: 0; left: 0; width: 100%;
-      padding: 0.7rem 1.5rem;
-      background: linear-gradient(to right, #1a1a2d, #0e0e1e);
-      border-bottom: 1px solid #8c52ff44;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      box-shadow: 0 0 12px #8c52ff33;
-      z-index: 1001;
-    }
-
-    .menu-icon {
-      font-size: 1.5rem;
-      color: #8c52ff;
-      cursor: pointer;
-      transition: transform 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.3rem;
-      user-select: none;
-    }
-
-    .menu-icon:hover { transform: scale(1.15); }
-
-    .title-bar h1 {
-      margin: 0;
-      font-size: 1.4rem;
-      color: #8c52ff;
-      flex: 1;
-      letter-spacing: 1px;
-      text-shadow: 0 0 8px #8c52ff99;
-    }
-
-    #chat-container {
-      margin-top: 64px;
-      margin-bottom: 100px;
-      padding: 1.5rem 2rem;
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      z-index: 1;
-      position: relative;
-    }
-
-    .message {
-      padding: 1rem 1.5rem;
-      border-radius: 20px;
-      max-width: 70%;
-      font-size: 1rem;
-      line-height: 1.6;
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      animation: slideUp 0.3s ease forwards, bubbleFloat 5s ease-in-out infinite;
-    }
-
-    .user {
-      align-self: flex-end;
-      background: rgba(140, 82, 255, 0.2);
-      border-left: 3px solid #8c52ff;
-      box-shadow: 0 0 14px rgba(140, 82, 255, 0.45), 0 0 20px rgba(140, 82, 255, 0.3);
-    }
-
-    .bot {
-      align-self: flex-start;
-      background: rgba(0, 255, 255, 0.2);
-      border-right: 3px solid #00ffff;
-      box-shadow: 0 0 14px rgba(0, 255, 255, 0.45), 0 0 20px rgba(0, 170, 255, 0.3);
-    }
-
-    .timestamp {
-      font-size: 0.7rem;
-      color: #bbb;
-      margin-top: 5px;
-      text-align: right;
-    }
-
-    #input-box {
-      position: fixed; bottom: 0; left: 0; width: 100%;
-      padding: 0.7rem 1rem;
-      display: flex; align-items: center; gap: 0.6rem;
-      background: #151522;
-      border-top: 2px solid #8c52ff55;
-      box-shadow: 0 -2px 15px #8c52ff33;
-      box-sizing: border-box;
-      z-index: 1000;
-    }
-
-    #user-input {
-      flex: 1;
-      padding: 0.9rem 1.2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 30px;
-      background: #1e1e30;
-      color: #ffffff;
-      box-shadow: inset 0 0 10px #8c52ff66, 0 0 5px #8c52ff33;
-      transition: 0.3s;
-      outline: none;
-    }
-
-    #user-input:focus {
-      box-shadow: 0 0 20px #8c52ff99, inset 0 0 16px #8c52ffaa;
-      background: #272742;
-    }
-
-    #send-button {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #00ffff, #8c52ff);
-      border: none;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 0 15px #00ffffaa, 0 0 30px #8c52ff55;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    #send-button:hover {
-      transform: scale(1.2);
-      box-shadow: 0 0 25px #00ffffcc, 0 0 35px #8c52ffaa;
-    }
-
-    #send-button svg {
-      width: 24px;
-      height: 24px;
-      fill: #111;
-    }
-
-    #side-menu {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 320px;
-      height: 100%;
-      background: #1b1b2f;
-      border-right: 2px solid #8c52ff44;
-      box-shadow: 4px 0 20px #8c52ff33;
-      padding: 2rem 1.5rem;
-      transform: translateX(-100%);
-      opacity: 0;
-      visibility: hidden;
-      transition: transform 0.4s ease, opacity 0.3s ease;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-    }
-
-    #side-menu.active {
-      transform: translateX(0);
-      opacity: 1;
-      visibility: visible;
-    }
-
-    #side-menu h2 {
-      color: #8c52ff;
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 6px #8c52ff88;
-      border-bottom: 1px solid #8c52ff44;
-      padding-bottom: 0.5rem;
-    }
-
-    #side-menu label {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-top: 1rem;
-      margin-bottom: 0.3rem;
-      color: #ccc;
-      font-size: 0.95rem;
-    }
-
-    #side-menu i {
-      color: #8c52ff;
-      min-width: 20px;
-    }
-
-    #bg-url {
-      background: #1e1e30;
-      border: 1px solid #8c52ff66;
-      padding: 0.6rem 0.9rem;
-      border-radius: 12px;
-      color: #fff;
-      width: 100%;
-      max-width: 90%;
-      box-shadow: inset 0 0 8px #8c52ff55, 0 0 8px #8c52ff33;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-    }
-
-    @media (max-width: 400px) {
-      #bg-url {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.7rem;
-      }
-    }
-
-    #close-menu {
-      background: linear-gradient(to right, #2b2b45, #1e1e30);
-      color: #ffffff;
-      border: 1px solid #8c52ff66;
-      border-radius: 10px;
-      padding: 0.6rem 1rem;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      box-shadow: 0 0 12px #8c52ff55;
-      transition: 0.3s ease;
-      margin-top: 0.5rem;
-    }
-
-    #close-menu:hover {
-      background: #8c52ff33;
-      box-shadow: 0 0 20px #8c52ffaa;
-      color: #fff;
-    }
-
-    .bubble-preview {
-      cursor: pointer;
-      padding: 0.7rem 1rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BreakIA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <title>Never IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
@@ -377,21 +70,21 @@
       animation-delay: 4s;
     }
 
-    .title-bar {
+        .title-bar {
       position: fixed; top: 0; left: 0; width: 100%;
       padding: 0.7rem 1.5rem;
-      background: linear-gradient(to right, #1E003A, #0D001D);
-      border-bottom: 1px solid #8C52FF44;
+      background: linear-gradient(to right, #190046, #070012);
+      border-bottom: 1px solid #8700FF;
       display: flex;
       align-items: center;
       gap: 1rem;
-      box-shadow: 0 0 12px #8c52ff33;
+      box-shadow: 0 0 12px #5B00FF;
       z-index: 1001;
     }
 
     .menu-icon {
       font-size: 1.5rem;
-      color: #8c52ff;
+      color: #8400FF;
       cursor: pointer;
       transition: transform 0.2s;
       display: flex;
@@ -405,11 +98,11 @@
 
     .title-bar h1 {
       margin: 0;
-      font-size: 1.4rem;
-      color: #8A00FF;
+      font-family: 'Orbitron', sans-serif;
+      color: #8700FF;
       flex: 1;
       letter-spacing: 1px;
-      text-shadow: 0 0 8px #40007B;
+      text-shadow: 0 0 8px #8c52ff99;
     }
 
     #chat-container {
@@ -641,6 +334,8 @@
       width: 100%;
       height: 100%;
       cursor: pointer;
+      
+    
     }
   </style>
 </head>
@@ -654,7 +349,7 @@
   <!-- Barra de título -->
   <div class="title-bar">
     <div class="menu-icon" onclick="document.getElementById('side-menu').classList.add('active')">&#8942;</div>
-    <h1>Chat Neon</h1>
+    <h1>N E V E R</h1>
   </div>
 
   <!-- Menu lateral -->
@@ -682,7 +377,10 @@
     <button id="send-button" title="Enviar mensagem">
       <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
-  </div>
+  <button id="mic-button" title="Gravar Áudio">
+  <i class="fas fa-microphone"></i>
+</button>
+</div>
 
   <script>
     // Abre e fecha o menu lateral
@@ -694,7 +392,7 @@
 </body>
 </html>
 
-<script src="comandos.js"></script>
+<script src="IntArtCode.js"></script>
 
 
 
@@ -717,11 +415,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const chatContainer = document.getElementById("chat-container");
   const inputBox = document.getElementById("user-input");
   const sendButton = document.getElementById("send-button");
-  const closeMenu = document.getElementById("close-menu");
-  const sideMenu = document.getElementById("side-menu");
-  const bgUrl = document.getElementById("bg-url");
-  const userColorInput = document.getElementById("user-color");
-  const botColorInput = document.getElementById("bot-color");
 
   function getTime() {
     const now = new Date();
@@ -741,10 +434,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!inputBox) return;
     const userText = inputBox.value.trim();
     if (userText === "") return;
-
     appendMessage(userText, "user");
     inputBox.value = "";
-
     const resposta = obterRespostaIA(userText);
     setTimeout(() => appendMessage(resposta, "bot"), 500);
   }
@@ -762,93 +453,129 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  if (closeMenu && sideMenu) {
-    closeMenu.addEventListener("click", function () {
-      sideMenu.classList.remove("active");
-    });
-  }
-
-  if (bgUrl) {
-    bgUrl.addEventListener("change", function () {
-      const url = this.value.trim();
-      if (url) {
-        document.body.style.backgroundImage = `url('${url}')`;
-        document.body.style.backgroundSize = "cover";
-        document.body.style.backgroundPosition = "center";
-        document.body.style.backgroundRepeat = "no-repeat";
-        document.body.style.backgroundAttachment = "fixed";
-      }
-    });
-  }
-
-  function aplicarEstiloCor(classe, cor, previewId, lado) {
-    const styleId = `${classe}-style`;
-    const oldStyle = document.getElementById(styleId);
-    if (oldStyle) oldStyle.remove();
-
-    const style = document.createElement("style");
-    style.id = styleId;
-    style.innerHTML = `
-      .${classe} {
-        background: ${cor}33 !important;
-        border-${lado}: 3px solid ${cor} !important;
-        box-shadow: 0 0 14px ${cor}77, 0 0 20px ${cor}55 !important;
-      }
-      #${previewId} {
-        background: ${cor}33 !important;
-        border-${lado}: 3px solid ${cor} !important;
-        box-shadow: 0 0 14px ${cor}77, 0 0 20px ${cor}55 !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  if (userColorInput) {
-    userColorInput.addEventListener("input", function () {
-      aplicarEstiloCor("user", this.value, "user-preview", "left");
-    });
-  }
-
-  if (botColorInput) {
-    botColorInput.addEventListener("input", function () {
-      aplicarEstiloCor("bot", this.value, "bot-preview", "right");
-    });
-  }
-
-  // ==============================
-  // TREINAMENTO DA IA - FINAL DO CÓDIGO
-  // ==============================
-
-  // Exemplos de entrada (como a IA reconhece a intenção)
-  const exemplosIA = {
-    saudacoes: [
-      "oi", "olá", "ola", "eae", "opa", "bom dia", "boa tarde", "boa noite", "salve", "fala ai", "falae"
-    ]
-  };
-
-  // Respostas aleatórias por categoria
-  const respostasIA = {
-    saudacoes: [
-      "Opa, tudo beleza?",
-      "E aí, como você tá?",
-      "Oi oi!",
-      "Boa tarde, seja bem-vindo!",
-      "Olá, no que posso te ajudar?",
-      "Fala comigo!",
-      "Salveee!"
-    ]
-  };
-
-  // IA: função que escolhe a resposta
-  function obterRespostaIA(texto) {
-    const entrada = texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-    if (exemplosIA.saudacoes.some(s => entrada.includes(s))) {
-      const opcoes = respostasIA.saudacoes;
-      return opcoes[Math.floor(Math.random() * opcoes.length)];
+  const conhecimentoIA = [
+    {
+      tipo: "Bem estar",
+      exemplos: ["oi, tudo bem?", "tudo bem?", "tá tudo bem?"],
+      respostas: ["sempre bem, e você?"]
+    },
+    {
+      tipo: "Saudações",
+      exemplos: ["oi", "olá", "fala", "opa", "qual foi", "koé", "visão"],
+      respostas: ["Oi oi, pode falar", "Oii", "Bem vindoo!", "Oláá", "Tô na área"]
+    },
+    {
+      tipo: "Despedidas",
+      exemplos: ["tchau", "até", "flw", "falou", "bye"],
+      respostas: ["Tchau tchau!", "Até maiss"]
+    },
+    {
+      tipo: "Apresntações",
+      exemplos: ["quem e"],
+      respostas: ["Eu sou Never"]
     }
+  ];
 
-    return "Hmm... não entendi muito bem. Pode repetir?";
+  function normalizarTexto(texto) {
+    return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
+  function calcularExpressao(texto) {
+    let t = texto.toLowerCase()
+      .replace(/raiz\s*(quadrada)?\s*de\s*(\d+(\.\d+)?)/g, 'Math.sqrt($2)')
+      .replace(/√(\d+(\.\d+)?)/g, 'Math.sqrt($1)')
+      .replace(/[x×]/g, '*')
+      .replace(/[÷]/g, '/')
+      .replace(/(\d+(\.\d+)?)%\s*de\s*(\d+(\.\d+)?)/g, '($1/100)*$3')
+      .replace(/(\d+(\.\d+)?)\s*(menos|menos de)\s*(\d+(\.\d+)?)%/g, '($1-($4/100)*$1)');
+
+    if (!/^[0-9+\-*/.<>=!\sMathsqrt()]+$/.test(t) || /^\s*\d+(\.\d+)?\s*$/.test(t)) return null;
+
+    try {
+      const r = Function('"use strict";return(' + t + ')')();
+      if (typeof r === 'boolean') return r ? 'Verdadeiro.' : 'Falso.';
+      if (typeof r === 'number' && !isNaN(r)) {
+        return `O resultado de ${texto} é ${Number.isInteger(r) ? r : r.toFixed(2)}.`;
+      }
+    } catch { }
+    return null;
+  }
+
+  function obterRespostaIA(textoUsuario) {
+    const texto = normalizarTexto(textoUsuario);
+    const c = calcularExpressao(texto);
+    if (c) return c;
+
+    for (const i of conhecimentoIA) {
+      for (const e of i.exemplos) {
+        if (texto.includes(e.toLowerCase()) && i.respostas.length > 0) {
+          return i.respostas[Math.floor(Math.random() * i.respostas.length)];
+        }
+      }
+    }
+    return "Não entendi bem. Tente perguntar de outro jeito.";
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.getElementById("mic-button")) {
+    const micButton = document.createElement("button");
+    micButton.id = "mic-button";
+    micButton.title = "Falar";
+    micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+    document.body.appendChild(micButton);
+  }
+
+  const micButton = document.getElementById("mic-button");
+  const inputBox = document.getElementById("user-input");
+
+  Object.assign(micButton.style, {
+    position: "absolute",
+    right: "70px",
+    bottom: "12px",
+    width: "44px",
+    height: "44px",
+    borderRadius: "50%",
+    border: "none",
+    background: "linear-gradient(135deg,#8c52ff,#00ffff)",
+    color: "#111",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "18px",
+    cursor: "pointer",
+    zIndex: "1002",
+    boxShadow: "0 0 12px #8c52ff88"
+  });
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    micButton.addEventListener("click", () => {
+      recognition.start();
+      micButton.style.background = "red";
+      micButton.style.boxShadow = "0 0 20px red";
+    });
+
+    recognition.onresult = function (event) {
+      const texto = event.results[0][0].transcript;
+      inputBox.value = texto;
+    };
+
+    recognition.onend = () => {
+      micButton.style.background = "linear-gradient(135deg, #8c52ff, #00ffff)";
+      micButton.style.boxShadow = "0 0 12px #8c52ff88";
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Erro no reconhecimento de voz:", event.error);
+    };
+  } else {
+    console.warn("Reconhecimento de voz não suportado neste navegador.");
+  }
 });
